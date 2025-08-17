@@ -1,0 +1,50 @@
+﻿@model PaginatedList<EmployeeDirectoryWebApplication.Models.Department>
+
+@{
+    ViewData["Title"] = "Отделы - Главная";
+}
+
+<h1>Отделы</h1>
+
+<p>
+    <a asp-action="Create">Создать</a>
+</p>
+
+<div class="form-group">
+    <input type="text" id="searchInput" class="form-control"
+           placeholder="Поиск..." value="@ViewData["CurrentFilter"]" />
+</div>
+
+<div id="departmentsTable">
+    @await Html.PartialAsync("_DepartmentsTablePartial", Model)
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var delayTimer;
+
+            $("#searchInput").keyup(function () {
+                clearTimeout(delayTimer);
+                var searchTerm = $(this).val();
+
+                delayTimer = setTimeout(function() {
+                    $.ajax({
+                        url: '@Url.Action("Index", "Departments")',
+                        type: 'GET',
+                        data: {
+                            searchString: searchTerm,
+                            pageNumber: 1
+                        },
+                        success: function (result) {
+                            $('#departmentsTable').html(result);
+                        },
+                        error: function (xhr, status, error) {
+                            console.error(error);
+                        }
+                    });
+                }, 300); // Задержка 300 мс
+            });
+        });
+    </script>
+}
